@@ -9,6 +9,8 @@ from app import app
 from flask import render_template, request, redirect, url_for, flash, session, abort
 from werkzeug.utils import secure_filename
 
+from forms import UploadForm
+
 
 ###
 # Routing for your application.
@@ -23,15 +25,36 @@ def home():
 @app.route('/about/')
 def about():
     """Render the website's about page."""
-    return render_template('about.html', name="Mary Jane")
+    return render_template('about.html', name="Rahmeesh Bowla")
 
 
-@app.route('/upload', methods=['POST', 'GET'])
+@app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if not session.get('logged_in'):
         abort(401)
-
+    
     # Instantiate your form class
+    
+    uploadform = UploadForm()
+    
+    if request.method == 'POST' and uploadform.validate_on_submit():
+
+        upload = uploadform.upload.data # we could also use request.files['photo']
+
+        filename = secure_filename(upload.filename)
+        upload.save(os.path.join(
+            app.config['UPLOAD_FOLDER'], filename
+        ))
+
+        return render_template('upload.html', form=uploadform)
+        
+    else:
+        flash_errors(uploadform)
+        return render_template('upload.html', form=uploadform)
+    
+    
+
+    
 
     # Validate file upload on submit
     if request.method == 'POST':
@@ -75,7 +98,7 @@ def flash_errors(form):
             flash(u"Error in the %s field - %s" % (
                 getattr(form, field).label.text,
                 error
-), 'danger')
+            ), 'danger')
 
 @app.route('/<file_name>.txt')
 def send_text_file(file_name):
