@@ -8,7 +8,6 @@ import os
 from app import app
 from flask import render_template, request, redirect, url_for, flash, session, abort
 from werkzeug.utils import secure_filename
-
 from forms import UploadForm
 
 
@@ -85,6 +84,32 @@ def logout():
     session.pop('logged_in', None)
     flash('You were logged out', 'success')
     return redirect(url_for('home'))
+    
+    
+def get_uploaded_images():
+    rootdir = os.getcwd()
+    print rootdir
+    
+    file_list=[]
+    
+    for subdir, dirs, files in os.walk(rootdir + '/app/static/uploads'):
+        for file in files:
+            if file[-4:] == '.jpg':
+                file_list.append("""<li> <img src="/static/uploads/{}" alt="picture" </li>""".format(file))
+            else:
+                file_list.append("<li> {} </li>".format(file))
+        return file_list
+            # return os.path.join(subdir, file)
+            
+
+@app.route('/files')
+def files():
+    if not session.get('logged_in'):
+        abort(401)
+        
+
+    
+    return render_template('files.html', files=get_uploaded_images())
 
 
 ###

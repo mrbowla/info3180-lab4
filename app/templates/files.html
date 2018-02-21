@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<h1 class="page-header">File List</h1>
+
+<ul>
+    {% for file in file_list %}
+    <li>{{ file }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
