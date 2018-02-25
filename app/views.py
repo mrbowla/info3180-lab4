@@ -44,8 +44,11 @@ def upload():
         upload.save(os.path.join(
             app.config['UPLOAD_FOLDER'], filename
         ))
-
-        return render_template('upload.html', form=uploadform)
+        
+        
+        flash('File Saved', 'success')
+        return render_template('home.html')
+        # return render_template('upload.html', form=uploadform)
         
     else:
         flash_errors(uploadform)
@@ -60,7 +63,7 @@ def upload():
         # Get file data and save to your uploads folder
 
         flash('File Saved', 'success')
-        return redirect(url_for('home'))
+        return render_template('home.html')
 
     return render_template('upload.html')
 
@@ -75,7 +78,7 @@ def login():
             session['logged_in'] = True
             
             flash('You were logged in', 'success')
-            return redirect(url_for('upload'))
+            return render_template('home.html')
     return render_template('login.html', error=error)
 
 
@@ -83,33 +86,42 @@ def login():
 def logout():
     session.pop('logged_in', None)
     flash('You were logged out', 'success')
-    return redirect(url_for('home'))
+    return render_template('home.html')
     
     
-def get_uploaded_images():
-    rootdir = os.getcwd()
-    print rootdir
-    
-    file_list=[]
-    
-    for subdir, dirs, files in os.walk(rootdir + '/app/static/uploads'):
-        for file in files:
-            if file[-4:] == '.jpg':
-                file_list.append("""<li> <img src="/static/uploads/{}" alt="picture" </li>""".format(file))
-            else:
-                file_list.append("<li> {} </li>".format(file))
-        return file_list
-            # return os.path.join(subdir, file)
+
             
 
 @app.route('/files')
 def files():
+    import os
+    
     if not session.get('logged_in'):
         abort(401)
-        
-
     
-    return render_template('files.html', files=get_uploaded_images())
+    # file_folder = app.config['UPLOAD_FOLDER']
+    
+    # listing = []
+    
+    # for subdir, dirs, files in os.walk(file_folder):
+    #     for file in files :
+    #         listing += [file]
+    
+    return get_uploaded_images()
+    
+def get_uploaded_images():
+    if not session.get('logged_in'):
+        abort(401)
+    
+    file_folder = app.config['UPLOAD_FOLDER']
+    
+    listing = []
+    
+    for subdir, dirs, files in os.walk(file_folder):
+        for file in files :
+            listing += [file]
+    return render_template('files.html', files=listing)
+        
 
 
 ###

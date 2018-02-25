@@ -1,12 +1,22 @@
 {% extends 'base.html' %}
 
-{% block main %}
-<h1 class="page-header">File List</h1>
+{% block css %}
 
-<ul>
-    {% for file in file_list %}
-    <li>{{ file }}</li>
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/styles.css')}}"
+{% endblock %}
+
+{% block main %}
+<h1 class="page-header">Uploaded Images</h1>
+
+<div class="grid-container">
+   {% for file in files %}
+   
+  <div class="grid-item">
+   <img src="{{ url_for('static', filename="uploads/" + file) }}" />
+   </div>
+   
+    
     {% endfor %}
-</ul>
+</div>
 
 {% endblock %}
